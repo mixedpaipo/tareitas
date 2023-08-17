@@ -19,11 +19,8 @@ def buscarparentesis(sentencia):
         elif(i == ")"): 
             o = int(sentencia.index(i))
             pro = (sentencia[index+1:o])
-            reemplazarparentesis(sentencia, i, index, pro)
             buscarparentesis(pro)
             
-import re
-
 # Definir expresiones regulares
 digito = re.compile("[1-9]")  # Dígito del 1 al 9
 digito_o_zero = re.compile("(?:digito|0)")  # Dígito o el número 0
@@ -36,14 +33,6 @@ operador = re.compile(r"(?:espacio*[+\-*/]espacio*)")  # Operadores (+, -, *, /)
 operacion = re.compile(r"(?:(?:clave|entero)(?:operador(?:entero|clave))*)")  # Operaciones
 sentencia = re.compile(r"(?:operacion(?:operador(?:entero|clave))*)")  # Sentencia
 
-# Ejemplos de uso
-print(ola.match("CUPON 42"))  # Coincide
-print(ola.match("CUPON 42 , 23"))  # Coincide
-print(ola.match("CUPON 42,23"))  # Coincide
-print(ola.match("CUPONANS"))  # Coincide
-print(sentencia.match("42 + ola"))  # Coincide
-print(sentencia.match("42 + ola * 23"))  # Coincide
 
     
             
-buscarparentesis("(1+(3+(4*(2+(2+3)))))")

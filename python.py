@@ -26,17 +26,17 @@ def operacionesbasicas(match):
         op1 = partes[0]
         op2 = partes[2]
         operador = partes[1]
-        if operador ==  "+":
-            return int(op1 + op2)
-        elif operador == "-":
-            return int(op1 - op2)
-        elif operador == "*":
+        if operador == "*":
             return int(op1 * op2)
         elif operador == "//":
             if op2 == 0:
-                return "Error"        
-            else:
-                return int(op1 / op2)    
+                return "Error"
+            else: 
+                return int(op1 // op2)
+        elif operador ==  "+":
+            return int(op1 + op2)
+        elif operador == "-":
+            return int(op1 - op2)
     else: 
         return "Error"       
  
@@ -60,23 +60,29 @@ def validarsintaxis(linea):
 def evaluar_operacion(operacion2):
     operacion_con_cupon = re.sub(ola.pattern, hacercupon, operacion2)
     operacion_con_ans = operacion_con_cupon.replace("ANS", str(resultado_anterior))
-    operacion_con_resultados = re.sub(operacion.pattern, operacionesbasicas, operacion_con_ans)
-    return operacion_con_resultados
+    return eval(int(operacion_con_ans))
+
     
-    
-def buscarparentesis(sentencia2): 
-    index = 0
-    for i in sentencia2:
-        if (i == "("):
-            index = lastindex(sentencia2, i)
-            continue
-        elif(i == ")"): 
-            o = int(sentencia2.index(i))
-            pro = evaluar_operacion(sentencia2[index+1:o])
-            return buscarparentesis(sentencia2[:index] + str(pro) + sentencia2[o+1:])
-    return evaluar_operacion(sentencia2)
+def buscarparentesis(sentencia2, inicio=0):
+    pila = []
+    i = inicio
+    while i < len(sentencia2):
+        if sentencia2[i] == "(":
+            pila.append(i)
+        elif sentencia2[i] == ")":
+            if pila:
+                inicio_paren = pila.pop()
+                operacion = sentencia2[inicio_paren+1:i]
+                if validarsintaxis(operacion):
+                    resultado = evaluar_operacion(operacion)
+                    sentencia2 = sentencia2[:inicio_paren] + str(resultado) + sentencia2[i+1:]
+                    i = inicio_paren + len(str(resultado))
+                else:
+                    return "Sin resolver"
+        i += 1
+    return sentencia2
             
-        
+
 def leerlineas(entrada, salida):
     global resultado_anterior
     for linea in entrada:
@@ -86,16 +92,15 @@ def leerlineas(entrada, salida):
             salida.write(f"\n")
             continue
         else: 
-            if validarsintaxis(linea):
-                resultado = buscarparentesis(linea) 
+            resultado = buscarparentesis(linea) 
+            if resultado != "Sin resolver":
+                print(resultado)
                 salida.write(f"{linea} = {resultado}\n")
                 resultado_anterior = resultado
             else:
-                salida.write(f"{linea} = Sin resolver \n")
-                
-                
-
-            
+                salida.write(f"{linea} = Sin resolver\n")
+    
+                      
 resultado_anterior = 0         
 archivo = open("problemas (EJEMPLO).txt","r")
 salida = open("desarrollos.txt", "w")
