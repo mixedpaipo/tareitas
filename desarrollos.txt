@@ -1,0 +1,9 @@
+2500 + 1200 = 3700
+ANS + 860 * 6 = 8860
+ANS // 3 = 2953
+
+ANS + 130 * 25 = 3250
+(2300 + 23 * (15) = Sin resolver (error de sintaxis)
+500(7) = Sin resolver (error de sintaxis)
+
+3000 * (5 - 23) // 5 = Sin resolver (error de sintaxis)

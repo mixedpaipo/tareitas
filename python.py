@@ -7,7 +7,7 @@ entero = re.compile("(?:para_entero|0)")
 espacio = re.compile(r"\s*")  
 ola = re.compile(r"(?:CUPON\s*\(\s*(?:entero|ANS)\s*,\s*espacio*(?:entero|ANS)\s*\))")
 clave = re.compile("(?:ANS|ola)")
-operador = re.compile(r"(?:espacio*[+\-*/]espacio*)")  
+operador = re.compile(r"(?:espacio*[+\-*//]+espacio*)")  
 operacion = re.compile(r"(?:(?:clave|entero)(?:operador(?:entero|clave))*)")  
 sentencia = re.compile(r"(?:operacion(?:operador(?:entero|clave))*)")  
 
@@ -19,27 +19,68 @@ def lastindex(sentencia2, i):
         else:
             a -= 1
             
+def sumayresta(ayuda):
+    l = 0
+    for index in ayuda:
+        if index == "+":
+            op1 = int(ayuda[l-1])
+            op2 = int(ayuda[l+1])
+            del ayuda[l-1:l+2]
+            resultadointermedio = op1 + op2
+            ayuda.insert(l,resultadointermedio)
+            print(ayuda)
+        elif index == "-":
+            op1 = int(ayuda[l-1])
+            op2 = int(ayuda[l+1])
+            del ayuda[l-1:l+2]
+            resultadointermedio = op1 - op2
+            ayuda.insert(l,resultadointermedio)
+            print(ayuda)
+        
+            
+            
+def multiplicaciones(ayuda):
+    l = 0
+    for index in ayuda: 
+        print(index)
+        if index == "*":
+            op1 = int(ayuda[l-1])
+            op2 = int(ayuda[l+1])
+            del ayuda[l-1:l+2]
+            resultadointermedio = op1 * op2
+            ayuda.insert(l,resultadointermedio)
+            print(ayuda)
+        else:
+            return ayuda
+        l += 1
+        
+    
+def divisiones(ayuda):
+    l = 0
+    for index in ayuda: 
+        if index == "//":
+            op1 = int(ayuda[l-1])
+            op2 = int(ayuda[l+1])
+            del ayuda[l-1:l+2]
+            resultadointermedio = op1 // op2
+            ayuda.insert(l,resultadointermedio)
+            print(ayuda)
+            divisiones(ayuda)
+        else:
+            return ayuda
+    l += 1
+        
+        
+        
 def operacionesbasicas(match):
-    alo = match.group(0)
-    partes = re.split(operacion.pattern, alo)
-    if len(partes) == 3:
-        op1 = partes[0]
-        op2 = partes[2]
-        operador = partes[1]
-        if operador == "*":
-            return int(op1 * op2)
-        elif operador == "//":
-            if op2 == 0:
-                return "Error"
-            else: 
-                return int(op1 // op2)
-        elif operador ==  "+":
-            return int(op1 + op2)
-        elif operador == "-":
-            return int(op1 - op2)
-    else: 
-        return "Error"       
- 
+    partes = re.split(r"\s*([+\-*]|//)\s*", match)
+    print(partes)
+    resultadointermedio = 0
+    partes = multiplicaciones(partes)
+    partes = divisiones(partes)
+    partes = sumayresta(partes)
+    
+    
 def cupon(match):
     if match.group(2) is None:
         x = int(match.group(1))
@@ -60,27 +101,28 @@ def validarsintaxis(linea):
 def evaluar_operacion(operacion2):
     operacion_con_cupon = re.sub(ola.pattern, hacercupon, operacion2)
     operacion_con_ans = operacion_con_cupon.replace("ANS", str(resultado_anterior))
-    return eval(int(operacion_con_ans))
+    print(operacion_con_ans)
+    a = operacionesbasicas(operacion_con_ans)
+    return a
+
 
     
-def buscarparentesis(sentencia2, inicio=0):
-    pila = []
-    i = inicio
-    while i < len(sentencia2):
-        if sentencia2[i] == "(":
-            pila.append(i)
-        elif sentencia2[i] == ")":
-            if pila:
-                inicio_paren = pila.pop()
-                operacion = sentencia2[inicio_paren+1:i]
-                if validarsintaxis(operacion):
-                    resultado = evaluar_operacion(operacion)
-                    sentencia2 = sentencia2[:inicio_paren] + str(resultado) + sentencia2[i+1:]
-                    i = inicio_paren + len(str(resultado))
-                else:
-                    return "Sin resolver"
-        i += 1
-    return sentencia2
+def buscarparentesis(sentencia2): 
+    index = 0
+    for i in sentencia2:
+        if (i == "("):
+            index = lastindex(sentencia2, i)
+            continue
+        elif(i == ")"): 
+            o = int(sentencia2.index(i))
+            operacion = sentencia2[index+1:o]
+            if validarsintaxis(operacion):
+                pro = evaluar_operacion(operacion)
+                return buscarparentesis(sentencia2[:index] + str(pro) + sentencia2[o+1:])
+            else:
+                return "Sin resolver (error de sintaxis)"
+    return evaluar_operacion(sentencia2)
+        
             
 
 def leerlineas(entrada, salida):
@@ -94,7 +136,6 @@ def leerlineas(entrada, salida):
         else: 
             resultado = buscarparentesis(linea) 
             if resultado != "Sin resolver":
-                print(resultado)
                 salida.write(f"{linea} = {resultado}\n")
                 resultado_anterior = resultado
             else:
