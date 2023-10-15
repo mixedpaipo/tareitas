@@ -5,7 +5,9 @@ public class Zona{
     Zona(){
         completado = false;
     }
+    public void Interactuar(Pikinim[] pikinim){}
 
+    
     public boolean getCompletar(){
         return completado;
     }
@@ -13,4 +15,6 @@ public class Zona{
     public void setCompletar(boolean completado){
         this.completado = completado;
     }
+
+    //Setters y Getters e interactuar se implementa en las diferentes zonas
 }

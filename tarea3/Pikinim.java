@@ -7,13 +7,18 @@ abstract public class Pikinim{
     Pikinim(int ataque, int capacidad, int cantidad){
         this.ataque = ataque;
         this.capacidad = capacidad;
-        this.cantidad = cantidad;|
+        this.cantidad = cantidad;
     }
 
 
     public void disminuir(int cantidad){
         this.cantidad -= cantidad;
+        if (this.cantidad < 0){
+            this.cantidad = 0;
+        }
     }
+
+    //Disminuir disminuye la cantidad de pikinims
 
     abstract public void multiplicar(int cantidad);
 
@@ -25,7 +30,12 @@ abstract public class Pikinim{
         return cantidad;
     }
 
+    public void setCantidad(int cantidad){
+        this.cantidad = cantidad;
+    }
     public int getAtaque(){
         return ataque;
     }
+
+    //Setters y getters
 } 
